@@ -1,7 +1,11 @@
-create table flight_data.flight_info_ex(
 15/03/17 06:38	15/03/17 05:35	B736	ESSA	Stockholm	Stockholm-Arlanda		15/03/17 06:38	SAS1011-1489383000-schedule-0000	268		0
 	15/03/17 05:30	00:50:00	13/03/17 05:30	SAS1011	ESNS	Skelleftea	Skelleftea
 
+create schema flight_data;
+
+-- flight metadata
+drop table flight_data.flight_info_ex;
+create table flight_data.flight_info_ex(
  actualarrivaltime datetime,
  actualdeparturetime datetime,
  aircrafttype varchar(32),
@@ -22,16 +26,25 @@ create table flight_data.flight_info_ex(
  originCity varchar(64),
  originName varchar(64),
  route varchar(32) null
-)
+);
 
-
+-- flight time series
+drop table flight_data.flight_track_point;
 create table flight_data.flight_track_point(
-(fa_flight_point['timestamp'],
-  fa_flight_point['latitude'],
-  fa_flight_point['longitude'],
-  fa_flight_point['altitude'],
-  fa_flight_point['altitudeChange'],
-  fa_flight_point['altitudeStatus'],
-  fa_flight_point['groundspeed'],
-  fa_flight_point['updateType'],
-  fa_flight_id))
+(  timestamp  datetime,
+    latitude  ,
+    longitude  ,
+    altitude  ,
+    altitudeChange  ,
+    altitudeStatus  ,
+    groundspeed  ,
+    updateType  ,
+  fa_flight_id));
+
+--load data from S3 bucket file
+copy flight_data.flight_info_ex from 's3://endava-fds/data/flight/flight_timeseries_v2_updated.csv'
+credentials 'aws_iam_role=arn:aws:iam::004532751075:role/endava-redshift-s3-access-role'
+ignoreheader 1
+format as csv
+null as 'null'
+region 'eu-west-1';
