@@ -48,9 +48,8 @@ create table flight_data.flight_track_point(
  flightId varchar(64) not null);
 
 --load data from S3 bucket files
-copy flight_data.flight_track_point from 's3://endava-fds/data/adsb/'
+copy flight_data.flight_track_point from 's3://endava-fds/data/adsb'
 credentials 'aws_iam_role=arn:aws:iam::004532751075:role/endava-redshift-s3-access-role'
-
 format as csv
 null as 'null'
 region 'eu-west-1';
